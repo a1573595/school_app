@@ -1,131 +1,17 @@
+import 'package:collection/collection.dart';
 import 'package:school_app/db/db_helper.dart';
 import 'package:school_app/enum/teacher_role.dart';
-import 'package:school_app/enum/user_status.dart';
 import 'package:school_app/model/course.dart';
 import 'package:school_app/model/student.dart';
 import 'package:school_app/model/teacher.dart';
 import 'package:sqflite/sqflite.dart';
 
-typedef TeacherWithCourseList = (Teacher, List<Course>);
-
-final List<TeacherWithCourseList> teacherWithCourseList = [
-  (
-    Teacher(
-      id: 0,
-      status: UserStatus.activate,
-      role: TeacherRole.lecturer,
-      email: "Teacher email",
-      name: "Teacher name",
-    ),
-    [
-      Course(
-        id: 0,
-        name: "Course name",
-        startAt: DateTime.now(),
-        endAt: DateTime.now(),
-        teacherId: 0,
-        studentIdList: [],
-      ),
-      Course(
-        id: 1,
-        name: "Course name",
-        startAt: DateTime.now(),
-        endAt: DateTime.now(),
-        teacherId: 0,
-        studentIdList: [],
-      ),
-      Course(
-        id: 2,
-        name: "Course name",
-        startAt: DateTime.now(),
-        endAt: DateTime.now(),
-        teacherId: 0,
-        studentIdList: [],
-      ),
-    ],
-  ),
-  (
-    Teacher(
-      id: 0,
-      status: UserStatus.activate,
-      role: TeacherRole.lecturer,
-      email: "Teacher email",
-      name: "Teacher name",
-    ),
-    [
-      Course(
-        id: 0,
-        name: "Course name",
-        startAt: DateTime.now(),
-        endAt: DateTime.now(),
-        teacherId: 0,
-        studentIdList: [],
-      ),
-      Course(
-        id: 1,
-        name: "Course name",
-        startAt: DateTime.now(),
-        endAt: DateTime.now(),
-        teacherId: 0,
-        studentIdList: [],
-      ),
-      Course(
-        id: 2,
-        name: "Course name",
-        startAt: DateTime.now(),
-        endAt: DateTime.now(),
-        teacherId: 0,
-        studentIdList: [],
-      ),
-    ],
-  ),
-  (
-    Teacher(
-      id: 0,
-      status: UserStatus.activate,
-      role: TeacherRole.lecturer,
-      email: "Teacher email",
-      name: "Teacher name",
-    ),
-    [
-      Course(
-        id: 0,
-        name: "Course name",
-        startAt: DateTime.now(),
-        endAt: DateTime.now(),
-        teacherId: 0,
-        studentIdList: [],
-      ),
-      Course(
-        id: 1,
-        name: "Course name",
-        startAt: DateTime.now(),
-        endAt: DateTime.now(),
-        teacherId: 0,
-        studentIdList: [],
-      ),
-      Course(
-        id: 2,
-        name: "Course name",
-        startAt: DateTime.now(),
-        endAt: DateTime.now(),
-        teacherId: 0,
-        studentIdList: [],
-      ),
-    ],
-  ),
-];
-
 abstract class UserDao {
-  final Database _db;
-
-  const UserDao({required Database database}) : _db = database;
-
   Future<List<Teacher>> getTeacherList();
 
-  // Future<List<TeacherWithCourseList>> getTeacherWitherCourseList();
-
   Future<List<Student>> getStudentList();
+
+  Future<List<(Teacher, List<Course>)>> getTeacherWithCourseList();
 
   Future<List<Student>> getStudentListByCourse({required Course course});
 
@@ -143,8 +29,10 @@ abstract class UserDao {
   });
 }
 
-class UserDaoImp extends UserDao {
-  const UserDaoImp({required super.database});
+class UserDaoImp implements UserDao {
+  final Database _db;
+
+  const UserDaoImp({required Database database}) : _db = database;
 
   @override
   Future<List<Student>> getStudentList() => _db.rawQuery('''
@@ -169,6 +57,30 @@ class UserDaoImp extends UserDao {
       WHERE 
         course.$columnCourseId = ${course.id}
       ''').then((value) => value.map(Student.fromJson).toList());
+
+  @override
+  Future<List<(Teacher, List<Course>)>> getTeacherWithCourseList() => _db.rawQuery("""
+      SELECT
+        teacher.$columnTeacherId,
+        teacher.$columnTeacherStatus,
+        teacher.$columnTeacherEmail,
+        teacher.$columnTeacherName,
+        teacher.$columnTeacherRole,
+        course.$columnCourseId,
+        course.$columnCourseName,
+        course.$columnCourseStartAt,
+        course.$columnCourseEndAt,
+        course.$columnCourseTeacherId,
+        course.$columnCourseStudentIdList
+      FROM $tableTeacher teacher
+      LEFT JOIN $tableCourse course ON
+        teacher.$columnTeacherId = course.$columnCourseTeacherId
+    """).then((value) => value.groupListsBy((e) => e[columnTeacherId])).then((value) => value.entries
+      .map((e) => (
+            Teacher.fromJson(e.value.first),
+            e.value.map(Course.fromJson).toList(),
+          ))
+      .toList());
 
   @override
   Future<List<Teacher>> getTeacherList() => _db.rawQuery('''

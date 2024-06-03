@@ -24,7 +24,7 @@ abstract class CourseRepository {
   Future<int> deleteCourse({required Course course});
 }
 
-class CourseRepositoryImp extends CourseRepository {
+class CourseRepositoryImp implements CourseRepository {
   final CourseDao _dao;
 
   CourseRepositoryImp({CourseDao? dao}) : _dao = dao ?? DbHelper.courseDao;

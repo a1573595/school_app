@@ -6,13 +6,7 @@ import 'package:school_app/model/student.dart';
 import 'package:school_app/model/teacher.dart';
 import 'package:sqflite/sqflite.dart';
 
-typedef CourseWithTeacher = (Course, Teacher);
-
 abstract class CourseDao {
-  final Database _db;
-
-  const CourseDao({required Database database}) : _db = database;
-
   Future<List<Course>> getCourseList();
 
   Future<List<Course>> getCourseListByStudent({required Student student});
@@ -32,8 +26,10 @@ abstract class CourseDao {
   Future<int> deleteCourse({required Course course});
 }
 
-class CourseDaoImp extends CourseDao {
-  const CourseDaoImp({required super.database});
+class CourseDaoImp implements CourseDao {
+  final Database _db;
+
+  const CourseDaoImp({required Database database}) : _db = database;
 
   @override
   Future<int> deleteCourse({required Course course}) => _db.rawDelete('''
@@ -58,7 +54,7 @@ class CourseDaoImp extends CourseDao {
   Future<List<Course>> getCourseListByStudent({required Student student}) => _db.rawQuery('''
       SELECT * FROM $tableCourse 
       WHERE 
-        $columnCourseStudentIdList LIKE '%' || ${student.id} || '%')
+        $columnCourseStudentIdList LIKE '%' || ${student.id} || '%'
       ''').then((value) => value.map(Course.fromJson).toList());
 
   @override

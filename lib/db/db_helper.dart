@@ -96,9 +96,11 @@ class DbHelper {
     _courseDao = CourseDaoImp(database: _database);
   }
 
-  static Future<void> testInit() async {
+  static Future<void> initForTest() async {
     await deleteDatabase(dbPath);
 
     await init();
   }
+
+  static Future<void> deInit() => _database.close();
 }
