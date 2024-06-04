@@ -9,11 +9,7 @@ import 'package:sqflite/sqflite.dart';
 abstract class UserDao {
   Future<List<Teacher>> getTeacherList();
 
-  Future<List<Student>> getStudentList();
-
   Future<List<(Teacher, List<Course>)>> getTeacherWithCourseList();
-
-  Future<List<Student>> getStudentListByCourse({required Course course});
 
   Future<int> postTeacher({
     required TeacherRole role,
@@ -21,6 +17,10 @@ abstract class UserDao {
     required String password,
     required String name,
   });
+
+  Future<List<Student>> getStudentList();
+
+  Future<List<Student>> getStudentListByCourse({required Course course});
 
   Future<int> postStudent({
     required String email,

@@ -9,19 +9,37 @@ class CoursePage extends StatelessWidget {
       appBar: AppBar(
         title: Text(L10n.current.course),
       ),
-      body: ListView.separated(
-        padding: const EdgeInsets.all(16),
-        itemCount: teacherWithCourseList.length,
-        separatorBuilder: (context, index) => const SizedBox(
-          height: 16,
-        ),
-        itemBuilder: (context, index) => _TeacherItem(
-          key: ValueKey(teacherWithCourseList[index].$1.id),
-          isLast: index == (teacherWithCourseList.length - 1),
-          data: teacherWithCourseList[index],
-        ),
-      ),
+      body: const _Body(),
     );
+  }
+}
+
+class _Body extends ConsumerWidget {
+  const _Body({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ref.watch(courseViewModel).when(
+          data: (data) => ListView.separated(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            itemCount: data.length,
+            separatorBuilder: (context, index) => const SizedBox(
+              height: 16,
+            ),
+            itemBuilder: (context, index) => _TeacherItem(
+              key: ValueKey(data[index].$1.id),
+              isLast: index == (data.length - 1),
+              data: data[index],
+            ),
+          ),
+          error: (error, stackTrace) => Center(
+            child: Text(error.toString()),
+          ),
+          loading: () => const Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
   }
 }
 

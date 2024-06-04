@@ -24,6 +24,12 @@ class FakeUserRepository implements UserRepository {
   }
 
   @override
+  Future<List<(Teacher, List<Course>)>> getTeacherWithCourseList() {
+    // TODO: implement getTeacherWithCourseList
+    throw UnimplementedError();
+  }
+
+  @override
   Future<int> postStudent({required String email, required String password, required String name}) {
     // TODO: implement postStudent
     throw UnimplementedError();

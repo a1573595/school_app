@@ -11,9 +11,7 @@ final userRepository = Provider<UserRepository>((ref) => UserRepositoryImp());
 abstract class UserRepository {
   Future<List<Teacher>> getTeacherList();
 
-  Future<List<Student>> getStudentList();
-
-  Future<List<Student>> getStudentListByCourse({required Course course});
+  Future<List<(Teacher, List<Course>)>> getTeacherWithCourseList();
 
   Future<int> postTeacher({
     required TeacherRole role,
@@ -21,6 +19,10 @@ abstract class UserRepository {
     required String password,
     required String name,
   });
+
+  Future<List<Student>> getStudentList();
+
+  Future<List<Student>> getStudentListByCourse({required Course course});
 
   Future<int> postStudent({
     required String email,
@@ -42,6 +44,9 @@ class UserRepositoryImp implements UserRepository {
 
   @override
   Future<List<Teacher>> getTeacherList() => _dao.getTeacherList();
+
+  @override
+  Future<List<(Teacher, List<Course>)>> getTeacherWithCourseList() => _dao.getTeacherWithCourseList();
 
   @override
   Future<int> postTeacher({
