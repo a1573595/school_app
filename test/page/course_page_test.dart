@@ -4,24 +4,19 @@ import 'package:school_app/page/course_view_model.dart';
 
 import '../test_widget.dart';
 
-// import '../repository/fake/fake_course_repository.dart';
-// import '../repository/fake/fake_user_repository.dart';
-
 void main() {
-  // final userRepository = FakeUserRepository();
-  // final courseRepository = FakeCourseRepository();
-
   group("Course page test", () {
     testWidgets("Loading", (widgetTester) async {
       await widgetTester.pumpWidget(buildTestWidget(
         overrides: [
-          courseViewModel.overrideWith((ref) => Future.delayed(Duration.zero)),
+          courseViewModel.overrideWith((ref) => Future.value([])),
         ],
         home: const CoursePage(),
       ));
 
-      final errorText = find.descendant(of: find.byType(Center), matching: find.byType(Text));
-      expect(errorText, findsOneWidget);
+      final circularProgressIndicator =
+          find.descendant(of: find.byType(Center), matching: find.byType(CircularProgressIndicator));
+      expect(circularProgressIndicator, findsOneWidget);
     });
 
     testWidgets("Error", (widgetTester) async {
